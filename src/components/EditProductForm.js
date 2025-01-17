@@ -11,7 +11,7 @@ const EditProductForm = ({ product, onUpdate }) => {
             onUpdate();
         } catch (error) {
             console.error("Error updating product:", error);
-            alert(`Failed to update product: ${error.response.data.error}`);
+            alert(`Failed to update product: ${error.response?.data?.error || error.message}`);
         }
     };
 
@@ -21,8 +21,8 @@ const EditProductForm = ({ product, onUpdate }) => {
                 Name:
                 <input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    value={formData.product_name}
+                    onChange={(e) => setFormData({ ...formData, product_name: e.target.value })}
                 />
             </label>
             <label>
@@ -34,18 +34,10 @@ const EditProductForm = ({ product, onUpdate }) => {
                 />
             </label>
             <label>
-                Color:
-                <input
-                    type="color"
-                    value={formData.color}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                />
-            </label>
-            <label>
                 Unit:
                 <input
                     type="text"
-                    value={formData.unit || ""}
+                    value={formData.unit}
                     onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                 />
             </label>

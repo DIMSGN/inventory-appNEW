@@ -3,7 +3,7 @@ import axios from "axios";
 import styles from "./RuleManager.module.css";
 
 const RuleManager = () => {
-    const [rules, setRules] = useState([]);
+    const [rules, setRules] = useState([]); // Define rules and setRules state variables
     const [newRule, setNewRule] = useState({ product_id: "", rules: "", comparison: "<=", amount: 0, color: "#FFFFFF" });
 
     const fetchRules = async () => {
@@ -22,6 +22,10 @@ const RuleManager = () => {
 
     const addRule = async (e) => {
         e.preventDefault();
+        if (!newRule.product_id || newRule.amount === undefined || !newRule.color) {
+            alert("Product ID, Amount, and Color are required");
+            return;
+        }
         try {
             await axios.post("http://localhost:5000/api/rules", newRule);
             fetchRules();
@@ -32,21 +36,11 @@ const RuleManager = () => {
         }
     };
 
-    const deleteRule = async (rule) => {
-        try {
-            await axios.delete("http://localhost:5000/api/rules", { data: rule });
-            fetchRules();
-        } catch (error) {
-            console.error("Error deleting rule:", error);
-            alert(`Failed to delete rule: ${error.response?.data?.error || error.message}`);
-        }
-    };
-
     return (
         <div className={styles.container}>
             <h2>Rule Manager</h2>
             <form onSubmit={addRule} className={styles.form}>
-                <div className={styles.formGroup}>
+                <div className={styles.formRow}>
                     <label className={styles.label}>
                         Product ID:
                         <input
@@ -54,12 +48,11 @@ const RuleManager = () => {
                             value={newRule.product_id}
                             onChange={(e) => setNewRule({ ...newRule, product_id: e.target.value })}
                             className={styles.input}
+                            required
                         />
                     </label>
-                </div>
-                <div className={styles.formGroup}>
                     <label className={styles.label}>
-                        Name:
+                        Name (Optional):
                         <input
                             type="text"
                             value={newRule.rules}
@@ -67,8 +60,6 @@ const RuleManager = () => {
                             className={styles.input}
                         />
                     </label>
-                </div>
-                <div className={styles.formGroup}>
                     <label className={styles.label}>
                         Comparison Operator:
                         <select
@@ -84,8 +75,6 @@ const RuleManager = () => {
                             <option value="!=">Not Equal (!=)</option>
                         </select>
                     </label>
-                </div>
-                <div className={styles.formGroup}>
                     <label className={styles.label}>
                         Amount:
                         <input
@@ -96,8 +85,6 @@ const RuleManager = () => {
                             required
                         />
                     </label>
-                </div>
-                <div className={styles.formGroup}>
                     <label className={styles.label}>
                         Color:
                         <input
@@ -108,19 +95,9 @@ const RuleManager = () => {
                             required
                         />
                     </label>
+                    <button type="submit" className={styles.button}>Add Rule</button>
                 </div>
-                <button type="submit" className={styles.button}>Add Rule</button>
             </form>
-
-            <h3 className={styles.heading}>Existing Rules</h3>
-            <ul className={styles.list}>
-                {rules.map((rule) => (
-                    <li key={rule.rule_id} className={styles.listItem} style={{ backgroundColor: rule.color }}>
-                        {rule.product_id} - - ("{rule.rules}", "{rule.comparison}", "{rule.amount}", "{rule.color}")
-                        <button onClick={() => deleteRule({ rule_id: rule.rule_id })} className={styles.deleteButton}>Delete</button>
-                    </li>
-                ))}
-            </ul>
         </div>
     );
 };

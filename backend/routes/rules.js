@@ -28,43 +28,18 @@ router.post("/", (req, res) => {
 });
 
 // Delete a rule
-router.delete("/", (req, res) => {
-    const { rule_id, product_id, comparison, amount, color } = req.body;
-    let query = "DELETE FROM rules";
-    let conditions = [];
-    let params = [];
-
-    if (rule_id) {
-        conditions.push("rule_id = ?");
-        params.push(rule_id);
-    }
-    if (product_id) {
-        conditions.push("product_id = ?");
-        params.push(product_id);
-    }
-    if (comparison) {
-        conditions.push("comparison = ?");
-        params.push(comparison);
-    }
-    if (amount) {
-        conditions.push("amount = ?");
-        params.push(amount);
-    }
-    if (color) {
-        conditions.push("color = ?");
-        params.push(color);
-    }
-
-    if (conditions.length > 0) {
-        query += " WHERE " + conditions.join(" AND ");
-    }
-
-    db.query(query, params, (err, results) => {
+router.delete("/:id", (req, res) => {
+    const { id } = req.params;
+    const query = "DELETE FROM rules WHERE id = ?";
+    db.query(query, [id], (err, results) => {
         if (err) {
             console.error("Error deleting rule:", err);
             return res.status(500).json({ error: err.message });
         }
-        res.status(200).json({ message: "Rule(s) deleted", affectedRows: results.affectedRows });
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: "Rule not found" });
+        }
+        res.status(200).json({ message: "Rule deleted" });
     });
 });
 
